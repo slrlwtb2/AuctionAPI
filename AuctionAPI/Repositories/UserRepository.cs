@@ -24,7 +24,20 @@ namespace AuctionAPI.Repositories
 
         public async Task<User> GetById(int id)
         {
-            return await _context.Users.FirstOrDefaultAsync(x => x.Id == id);
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == id);
+            return user;
+        }
+
+        public async Task<Seller> GetSellerById(int id)
+        {
+            var seller = await _context.Users.OfType<Seller>().FirstOrDefaultAsync(s => s.Id == id);
+            return seller;
+        }
+
+        public async Task<List<Seller>> GetSellers()
+        {
+            var sellers =  await _context.Users.OfType<Seller>().ToListAsync();
+            return sellers;
         }
 
         public async Task<List<User>> GetUsers()
@@ -35,6 +48,13 @@ namespace AuctionAPI.Repositories
         public async Task Save()
         {
             await _context.SaveChangesAsync();
+        }
+
+        public bool SellerExist(int id)
+        {
+            Seller? seller = _context.Users.OfType<Seller>().FirstOrDefault(x => x.Id == id);
+            if (seller == null) { return false; }
+            return true;
         }
 
         public void UpdateUser(User user)
