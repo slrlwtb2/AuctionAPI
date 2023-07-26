@@ -19,9 +19,12 @@ namespace AuctionAPI.Models
         public int SellerId { get; set; }
         public float StartingPrice { get; set; }
         public float CurrentBid { get; set; }
+        [ForeignKey("User")]
+        public int? BidWinnerId { get; set; }
         public DateTime BidEndTime { get; set; }
 
-
+        [JsonIgnore]
+        public User User { get; set; } //navigation property
         [JsonIgnore]
         public Seller Seller { get; set; } //navigation property
         [JsonIgnore]
