@@ -1,4 +1,27 @@
 # Auction API Endpoints
+The Auction API provides endpoints for managing an auction system. The API supports creating, updating, and deleting categories and products. Users can place bids on products, and sellers can be rated by users.
+
+This API does not contain authorization or authentication. It serves as a mock-up lightweight API for my API learning progress.
+
+
+## Endpoints Summary
+
+### Category
+- Allows creating, retrieving, updating, and deleting categories.
+
+### Product
+- Allows creating, retrieving, updating, and deleting products.
+- Users can place bids on products, and bidable products can be retrieved.
+
+### User
+- Allows creating, retrieving, updating users.
+- Users can check their balance and increase/decrease their balance.
+- Users can rate sellers.
+
+### Seller
+- Allows creating and retrieving sellers.
+- Sellers can be rated.
+
 
 ## CategoryController
 
