@@ -12,7 +12,7 @@ namespace AuctionAPI.Models
         public string Username { get; set; } = string.Empty;
         [EmailAddress]
         public string? Email { get; set; }
-        private float Balance { get; set; } = 0;
+        public float Balance { get; set; } = 0;
         public virtual bool Bidable { get; set; } = true;
         public DateTime RegisterationDate { get; set; }
 
