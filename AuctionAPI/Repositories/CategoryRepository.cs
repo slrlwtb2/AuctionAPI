@@ -17,6 +17,13 @@ namespace AuctionAPI.Repositories
             await _context.Categories.AddAsync(category);
         }
 
+        public bool CategoryExist(int id)
+        {
+            var category = _context.Categories.FirstOrDefault(c => c.Id == id);
+            if (category == null) { return false; }
+            return true;
+        }
+
         public void DeleteCategory(Category category)
         {
             _context.Categories.Remove(category);
@@ -32,9 +39,9 @@ namespace AuctionAPI.Repositories
             return await _context.Categories.FirstAsync(c => c.Id == id);
         }
 
-        public void Save()
+        public async Task Save()
         {
-          _context.SaveChangesAsync();
+          await _context.SaveChangesAsync();
         }
 
         public void UpdateCategory(Category category)

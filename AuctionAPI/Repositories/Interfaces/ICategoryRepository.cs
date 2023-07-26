@@ -9,6 +9,7 @@ namespace AuctionAPI.Repositories.Interfaces
         Task AddCategory(Category category);
         void DeleteCategory(Category category);
         void UpdateCategory(Category category);
-        void Save();
+        Task Save();
+        bool CategoryExist(int id);
     }
 }
