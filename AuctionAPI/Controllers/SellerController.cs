@@ -21,7 +21,8 @@ namespace AuctionAPI.Controllers
             {
                 Username = username,
                 Email = email ?? string.Empty,
-                RegisterationDate= DateTime.Now
+                RegisterationDate= DateTime.Now,
+                Bidable = false
             };
             await _userRepository.AddUser(seller);
             await _userRepository.Save();
