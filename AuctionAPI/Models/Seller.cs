@@ -13,7 +13,9 @@ namespace AuctionAPI.Models
 
         public float GetRating()
         {
-            if(RatingCount>0) return Rating/RatingCount; else return 0;
+            float rating = Rating / RatingCount;
+            float ratingfloor = (float)Math.Floor(rating * 10) / 10;
+            if (RatingCount > 0) return ratingfloor; else return 0;
         }
     }
 }
