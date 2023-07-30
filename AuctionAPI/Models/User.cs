@@ -9,11 +9,14 @@ namespace AuctionAPI.Models
         [Key]
         public int Id { get; set; }
         [Required]
+        [StringLength(20)]
         public string Username { get; set; } = string.Empty;
         [EmailAddress]
         public string? Email { get; set; }
         public float Balance { get; set; } = 0;
+        [Required]
         public virtual bool Bidable { get; set; } = true;
+        [Required]
         public DateTime RegisterationDate { get; set; }
 
         public float GetBalance()

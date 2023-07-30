@@ -1,9 +1,11 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace AuctionAPI.Models
 {
     public class Seller : User
     {
+        [Range(1,5)]
         public float Rating { get; set; }
         public int RatingCount { get; set; } = 0;
         public override bool Bidable { get => base.Bidable; set => base.Bidable = false; }

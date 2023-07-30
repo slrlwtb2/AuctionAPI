@@ -9,7 +9,9 @@ namespace AuctionAPI.Models
         [Key]
         public int Id { get; set; }
         [Required]
+        [StringLength(100)]
         public string Name { get; set; } = string.Empty;
+        [StringLength(200)]
         public string Description { get; set; } = string.Empty;
         [Required]
         [ForeignKey("Category")]
@@ -17,10 +19,13 @@ namespace AuctionAPI.Models
         [Required]
         [ForeignKey("Seller")]
         public int SellerId { get; set; }
+        [Required]
+        [Range(0.0f,float.MaxValue)]
         public float StartingPrice { get; set; }
-        public float CurrentBid { get; set; }
+        public float CurrentBid { get; set; } = 0.0f;
         [ForeignKey("User")]
-        public int? BidWinnerId { get; set; }
+        public int? BidWinnerId { get; set; } = null;
+        [Required]
         public DateTime BidEndTime { get; set; }
 
         [JsonIgnore]
