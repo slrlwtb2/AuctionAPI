@@ -2,6 +2,7 @@
 using AuctionAPI.Repositories.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
 namespace AuctionAPI.Controllers
 {
@@ -17,72 +18,120 @@ namespace AuctionAPI.Controllers
         [HttpGet("GetUsers")]
         public async Task<IActionResult> GetUsers()
         {
-            var users = await _userRepository.GetUsers();
-            return Ok(users);
+            try
+            {
+                var users = await _userRepository.GetUsers();
+                return Ok(users);
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"ERROR:{ex.Message}");
+                return StatusCode(500, "An unexpected error occurred.Please try again later.");
+            }
         }
         [HttpGet("GetBalance")]
         public async Task<IActionResult> GetBalance(int userId)
         {
-            User user = await _userRepository.GetById(userId);
-            return Ok(user.GetBalance());
+            try
+            {
+                User user = await _userRepository.GetById(userId);
+                return Ok(user.GetBalance());
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"ERROR:{ex.Message}");
+                return StatusCode(500, "An unexpected error occurred.Please try again later.");
+            }
         }
         [HttpPost("CreateUser")]
         public async Task<IActionResult> CreateUser(string username,string? email)
         {
-            User user = new User()
+            try
             {
-                Username = username,
-                Email = email ?? string.Empty,
-                RegisterationDate= DateTime.Now,
-            };
-            await _userRepository.AddUser(user);
-            await _userRepository.Save();
-            
-            return Ok(user);
+                User user = new User()
+                {
+                    Username = username,
+                    Email = email ?? string.Empty,
+                    RegisterationDate = DateTime.Now,
+                };
+                await _userRepository.AddUser(user);
+                await _userRepository.Save();
+
+                return Ok(user);
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"ERROR:{ex.Message}");
+                return StatusCode(500, "An unexpected error occurred.Please try again later.");
+            }
         }
         [HttpPut("IncreaseBalance")]
         public async Task<IActionResult> IncreaseBalnace(int userId, float amount)
         {
-            if (_userRepository.UserExist(userId))
+            try
             {
-                User user = await _userRepository.GetById(userId);
-                user.IncreaseBalance(amount);
-                await _userRepository.Save();
-                return Ok($"User:{user.Username}'s balance has increased by {amount}"); 
+                if (_userRepository.UserExist(userId))
+                {
+                    User user = await _userRepository.GetById(userId);
+                    user.IncreaseBalance(amount);
+                    await _userRepository.Save();
+                    return Ok($"User:{user.Username}'s balance has increased by {amount}");
+                }
+                return BadRequest($"User with the id of {userId} does not exist.");
             }
-            return BadRequest($"User with the id of {userId} does not exist.");
+            catch (Exception ex)
+            {
+                Log.Error($"ERROR:{ex.Message}");
+                return StatusCode(500, "An unexpected error occurred.Please try again later.");
+            }
         }
         [HttpPut("DecreaseBalance")]
         public async Task<IActionResult> DecreaseBalance(int userId, float amount)
         {
-            if (_userRepository.UserExist(userId))
+            try
             {
-                User user = await _userRepository.GetById(userId);
-                user.DecreaseBalance(amount);
-                await _userRepository.Save();
-                return Ok($"User:{user.Username}'s balance has decreased by {amount}."); 
+                if (_userRepository.UserExist(userId))
+                {
+                    User user = await _userRepository.GetById(userId);
+                    user.DecreaseBalance(amount);
+                    await _userRepository.Save();
+                    return Ok($"User:{user.Username}'s balance has decreased by {amount}.");
+                }
+                return BadRequest($"User with the id of {userId} does not exist.");
             }
-            return BadRequest($"User with the id of {userId} does not exist.");
+            catch (Exception ex)
+            {
+                Log.Error($"ERROR:{ex.Message}");
+                return StatusCode(500, "An unexpected error occurred.Please try again later.");
+            }
         }
         [HttpPut("GiveRatingToSeller")]
         public async Task<IActionResult> GiveRatingToSeller(int sellerId, int amount)
         {
-            if (_userRepository.SellerExist(sellerId))
+            try
             {
-                Seller seller = await _userRepository.GetSellerById(sellerId);
-                if (amount <= 5 && amount >= 0)
+                if (_userRepository.SellerExist(sellerId))
                 {
-                    seller.Rating += amount;
-                    seller.RatingCount += 1;
+                    Seller seller = await _userRepository.GetSellerById(sellerId);
+                    if (amount <= 5 && amount >= 0)
+                    {
+                        seller.Rating += amount;
+                        seller.RatingCount += 1;
+                    }
+                    else
+                    {
+                        return BadRequest("Rating must be between 0 to 5.");
+                    }
+                    await _userRepository.Save();
+                    return Ok($"{seller.Username}'s rating has increased by {amount}.");
                 }
-                else
-                {
-                    return BadRequest("Rating must be between 0 to 5.");
-                }
-                await _userRepository.Save();
-                return Ok($"{seller.Username}'s rating has increased by {amount}.");
+                return BadRequest($"Seller with the id of {sellerId} does not exist.");
             }
-            return BadRequest($"Seller with the id of {sellerId} does not exist.");
+            catch (Exception ex)
+            {
+                Log.Error($"ERROR:{ex.Message}");
+                return StatusCode(500, "An unexpected error occurred.Please try again later.");
+            }
         }
 
     }

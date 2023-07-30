@@ -2,6 +2,7 @@
 using AuctionAPI.Repositories.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
 namespace AuctionAPI.Controllers
 {
@@ -17,32 +18,56 @@ namespace AuctionAPI.Controllers
         [HttpPost("CreateSeller")]
         public async Task<IActionResult> CreateSeller(string username,string? email)
         {
-            User seller = new Seller()
+            try
             {
-                Username = username,
-                Email = email ?? string.Empty,
-                RegisterationDate= DateTime.Now,
-                Bidable = false
-            };
-            await _userRepository.AddUser(seller);
-            await _userRepository.Save();
-            return Ok(seller);
+                User seller = new Seller()
+                {
+                    Username = username,
+                    Email = email ?? string.Empty,
+                    RegisterationDate = DateTime.Now,
+                    Bidable = false
+                };
+                await _userRepository.AddUser(seller);
+                await _userRepository.Save();
+                return Ok(seller);
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"ERROR:{ex.Message}");
+                return StatusCode(500, "An unexpected error occurred.Please try again later.");
+            }
         }
         [HttpGet("GetSellers")]
         public async Task<IActionResult> GetSellers()
         {
-            var sellers = await _userRepository.GetSellers();
-            return Ok(sellers);
+            try
+            {
+                var sellers = await _userRepository.GetSellers();
+                return Ok(sellers);
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"ERROR:{ex.Message}");
+                return StatusCode(500, "An unexpected error occurred.Please try again later.");
+            }
         }
         [HttpGet("GetRating")]
         public async Task<IActionResult> GetRating(int sellerId)
         {
-            if (_userRepository.SellerExist(sellerId))
+            try
             {
-                Seller seller = await _userRepository.GetSellerById(sellerId);
-                return Ok(seller.GetRating()); 
+                if (_userRepository.SellerExist(sellerId))
+                {
+                    Seller seller = await _userRepository.GetSellerById(sellerId);
+                    return Ok(seller.GetRating());
+                }
+                return BadRequest($"Seller with the id of {sellerId} does not exist.");
             }
-            return BadRequest($"Seller with the id of {sellerId} does not exist.");
+            catch (Exception ex)
+            {
+                Log.Error($"ERROR:{ex.Message}");
+                return StatusCode(500, "An unexpected error occurred.Please try again later.");
+            }
         }
     }
 }
