@@ -1,4 +1,5 @@
-﻿using AuctionAPI.Models;
+﻿using AuctionAPI.DTOs;
+using AuctionAPI.Models;
 using AuctionAPI.Repositories.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -37,21 +38,16 @@ namespace AuctionAPI.Controllers
             }
         }
         [HttpPut("UpdateProduct")]
-        public async Task<IActionResult> UpdateProduct(
-            int productId,
-            string? productName,
-            string? productDescription,
-            int? categoryId,
-            float? startingPrice)
+        public async Task<IActionResult> UpdateProduct(int productId,UpdateProductDTO updateProductDTO)
         {
             try
             {
                 var product = await _productRepository.GetProductById(productId);
                 if (product == null) { return BadRequest($"product id {productId} does not exist."); }
-                product.Name = productName ?? product.Name;
-                product.Description = productDescription ?? product.Description;
-                product.CategoryId = categoryId ?? product.CategoryId;
-                product.StartingPrice = startingPrice ?? product.StartingPrice;
+                product.Name = updateProductDTO.Name ?? product.Name;
+                product.Description = updateProductDTO.Description ?? product.Description;
+                product.CategoryId = updateProductDTO.CategoryId ?? product.CategoryId;
+                product.StartingPrice = updateProductDTO.StarttingPrice ?? product.StartingPrice;
                 _productRepository.UpdateProduct(product);
                 await _productRepository.Save();
                 Log.Information($"Update Product => {product}");
@@ -64,22 +60,22 @@ namespace AuctionAPI.Controllers
             }
         }
         [HttpPost("CreateProduct")]
-        public async Task<IActionResult> CreateProduct(string name,string? description,int categoryId,int sellerId,float startingPrice,double endTime)
+        public async Task<IActionResult> CreateProduct(int sellerId,ProductDTO productDTO)
         {
             try
             {
-                if (_userRepository.SellerExist(sellerId) && _categoryRepository.CategoryExist(categoryId))
+                if (_userRepository.SellerExist(sellerId) && _categoryRepository.CategoryExist(productDTO.CategoryId))
                 {
                     Product product = new Product()
                     {
-                        Name = name,
-                        Description = description ?? string.Empty,
-                        CategoryId = categoryId,
+                        Name = productDTO.Name,
+                        Description = productDTO.Description ?? string.Empty,
+                        CategoryId = productDTO.CategoryId,
                         SellerId = sellerId,
-                        StartingPrice = startingPrice,
+                        StartingPrice = productDTO.StarttingPrice,
                         CurrentBid = 0,
                         BidWinnerId = null,
-                        BidEndTime = DateTime.Now.AddMinutes(endTime)
+                        BidEndTime = DateTime.Now.AddMinutes(productDTO.BidEndTime)
                     };
                     await _productRepository.AddProduct(product);
                     await _productRepository.Save();
